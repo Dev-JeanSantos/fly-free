@@ -1,13 +1,13 @@
 package br.com.flyfree.infrastructure.client
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
+import java.math.BigDecimal
 import java.time.LocalDate
 
 @Component
@@ -28,16 +28,23 @@ class GeckoApiClient(
         from: String,
         to: String,
         departureDate: LocalDate,
-        adults: Int = 1
-    ): List<GeckoFlightDto> {
+        returnDate: LocalDate? = null,
+        numAdults: Int = 1,
+        numChildren: Int = 0,
+        numInfants: Int = 0
+    ): List<GeckoItineraryDto> {
         log.info("Buscando voos GOL: $from → $to em $departureDate")
 
         val request = GeckoRequest(
-            target = "voegol.com.br:plp",
+            target = "voegol.com.br",
+            type = "plp",
             from = from,
             to = to,
             departureDate = departureDate.toString(),
-            adults = adults
+            returnDate = returnDate?.toString(),
+            numAdults = numAdults,
+            numChildren = numChildren,
+            numInfants = numInfants
         )
 
         return webClient.post()
@@ -50,40 +57,78 @@ class GeckoApiClient(
                 Mono.empty()
             }
             .block()
-            ?.results
+            ?.data
+            ?.itineraries
             ?: emptyList()
     }
 }
 
+// ── Request ──────────────────────────────────────────────
+
 data class GeckoRequest(
     val target: String,
+    val type: String,
     val from: String,
     val to: String,
-    @JsonProperty("departure_date")
     val departureDate: String,
-    val adults: Int = 1
+    val returnDate: String? = null,
+    val numAdults: Int = 1,
+    val numChildren: Int = 0,
+    val numInfants: Int = 0
 )
+
+// ── Response ─────────────────────────────────────────────
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class GeckoResponse(
-    val results: List<GeckoFlightDto> = emptyList()
+    val data: GeckoData? = null
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class GeckoFlightDto(
-    @JsonProperty("flight_number")
-    val flightNumber: String? = null,
+data class GeckoData(
+    val itineraries: List<GeckoItineraryDto> = emptyList(),
+    val success: Boolean = false,
+    val totalResults: Int = 0
+)
 
-    @JsonProperty("departure_time")
-    val departureTime: String? = null,
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class GeckoItineraryDto(
+    val position: Int? = null,
+    val origin: String? = null,
+    val destination: String? = null,
+    val departure: String? = null,
+    val arrival: String? = null,
+    val stopsCount: Int? = 0,
+    val duration: String? = null,
+    val segments: List<GeckoSegmentDto> = emptyList(),
+    val cheapestOffer: GeckoCheapestOfferDto? = null
+)
 
-    @JsonProperty("arrival_time")
-    val arrivalTime: String? = null,
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class GeckoSegmentDto(
+    val origin: String? = null,
+    val destination: String? = null,
+    val departure: String? = null,
+    val arrival: String? = null,
+    val duration: String? = null,
+    val flight: GeckoFlightInfoDto? = null
+)
 
-    val price: Double? = null,
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class GeckoFlightInfoDto(
+    val airlineCode: String? = null,
+    val flightNumber: String? = null
+)
 
-    val stops: Int? = 0,
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class GeckoCheapestOfferDto(
+    val brandId: String? = null,
+    val cabinClass: String? = null,
+    val total: GeckoPriceDto? = null
+)
 
-    @JsonProperty("fare_class")
-    val fareClass: String? = null
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class GeckoPriceDto(
+    val currency: String? = null,
+    val amount: BigDecimal? = null
 )
