@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: flyfree-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: flyfree
+      POSTGRES_USER: flyfree
+      POSTGRES_PASSWORD: flyfree123
+    ports:
+      - "5432:5432"
+    volumes:
+      - flyfree_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flyfree -d flyfree"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  flyfree_pgdata:
+    driver: local
