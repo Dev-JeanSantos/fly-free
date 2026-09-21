@@ -1,0 +1,37 @@
+### fly-free — Exemplos de chamadas REST
+### Compatível com IntelliJ HTTP Client e VS Code REST Client
+
+@baseUrl = http://localhost:8080
+
+# ─────────────────────────────────────────
+# ROTAS
+# ─────────────────────────────────────────
+
+### 1. Cadastrar rota para monitoramento (com returnDate)
+POST {{baseUrl}}/api/v1/routes?from=GRU&to=GIG&date=2026-10-05&returnDate=2026-10-12
+
+### 2. Cadastrar outra rota
+POST {{baseUrl}}/api/v1/routes?from=GRU&to=SSA&date=2026-10-15&returnDate=2026-10-22
+
+### 3. Listar todas as rotas cadastradas
+GET {{baseUrl}}/api/v1/routes
+
+### 4. Desativar uma rota (substitua {id} pelo id retornado no cadastro)
+DELETE {{baseUrl}}/api/v1/routes/1
+
+# ─────────────────────────────────────────
+# VOOS
+# ─────────────────────────────────────────
+
+### 5. Consultar melhor oferta para uma rota
+GET {{baseUrl}}/api/v1/flights?from=GRU&to=GIG&date=2026-10-05
+
+# ─────────────────────────────────────────
+# SINCRONIZAÇÃO
+# ─────────────────────────────────────────
+
+### 6. Forçar sincronização manual (busca dados na GeckoAPI agora)
+POST {{baseUrl}}/api/v1/sync/trigger
+
+### 7. Consultar histórico de sincronizações
+GET {{baseUrl}}/api/v1/sync/logs?limit=10

@@ -51,6 +51,13 @@ class GeckoApiClient(
             .uri("/v1/extract")
             .bodyValue(request)
             .retrieve()
+            .onStatus({ it.is4xxClientError }) { response ->
+                response.bodyToMono<String>().doOnNext { body ->
+                    log.error("GeckoAPI 4xx - body: $body")
+                }.flatMap { body ->
+                    reactor.core.publisher.Mono.error(RuntimeException("GeckoAPI error: $body"))
+                }
+            }
             .bodyToMono<GeckoResponse>()
             .onErrorResume { e ->
                 log.error("Erro ao chamar GeckoAPI: ${e.message}")

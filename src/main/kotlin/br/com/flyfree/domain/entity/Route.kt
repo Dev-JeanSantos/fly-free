@@ -24,6 +24,9 @@ data class Route(
     @Column(name = "travel_date", nullable = false)
     val travelDate: LocalDate,
 
+    @Column(name = "return_date")
+    val returnDate: LocalDate? = null,
+
     @Column(nullable = false)
     val active: Boolean = true,
 

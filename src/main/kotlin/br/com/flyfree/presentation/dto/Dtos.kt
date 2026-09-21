@@ -19,6 +19,7 @@ data class RouteResponse(
     val from: String,
     val to: String,
     val date: LocalDate,
+    val returnDate: LocalDate?,
     val active: Boolean,
     val createdAt: LocalDateTime
 )

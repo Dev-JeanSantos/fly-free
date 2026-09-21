@@ -12,7 +12,7 @@ import java.time.LocalDate
 class RouteService(private val routeRepository: RouteRepository) {
 
     @Transactional
-    fun register(from: String, to: String, date: LocalDate): Route {
+    fun register(from: String, to: String, date: LocalDate, returnDate: LocalDate? = null): Route {
         routeRepository.findByOriginAndDestinationAndTravelDate(
             from.uppercase(), to.uppercase(), date
         ).ifPresent {
@@ -23,7 +23,8 @@ class RouteService(private val routeRepository: RouteRepository) {
             Route(
                 origin = from.uppercase(),
                 destination = to.uppercase(),
-                travelDate = date
+                travelDate = date,
+                returnDate = returnDate
             )
         )
     }

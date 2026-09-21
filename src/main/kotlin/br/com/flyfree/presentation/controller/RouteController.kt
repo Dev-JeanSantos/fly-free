@@ -16,15 +16,17 @@ class RouteController(private val routeService: RouteService) {
     fun register(
         @RequestParam from: String,
         @RequestParam to: String,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) returnDate: LocalDate?
     ): ResponseEntity<RouteResponse> {
-        val route = routeService.register(from, to, date)
+        val route = routeService.register(from, to, date, returnDate)
         return ResponseEntity.status(HttpStatus.CREATED).body(
             RouteResponse(
                 id = route.id,
                 from = route.origin,
                 to = route.destination,
                 date = route.travelDate,
+                returnDate = route.returnDate,
                 active = route.active,
                 createdAt = route.createdAt
             )
@@ -39,6 +41,7 @@ class RouteController(private val routeService: RouteService) {
                 from = it.origin,
                 to = it.destination,
                 date = it.travelDate,
+                returnDate = it.returnDate,
                 active = it.active,
                 createdAt = it.createdAt
             )
@@ -55,6 +58,7 @@ class RouteController(private val routeService: RouteService) {
                 from = route.origin,
                 to = route.destination,
                 date = route.travelDate,
+                returnDate = route.returnDate,
                 active = route.active,
                 createdAt = route.createdAt
             )

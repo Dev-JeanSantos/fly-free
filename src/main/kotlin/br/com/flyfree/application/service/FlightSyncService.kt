@@ -59,7 +59,8 @@ class FlightSyncService(
                 val itineraries = geckoApiClient.fetchGolFlights(
                     from = route.origin,
                     to = route.destination,
-                    departureDate = route.travelDate
+                    departureDate = route.travelDate,
+                    returnDate = route.returnDate
                 )
 
                 // Filtra apenas itinerários da rota de ida (origin == route.origin)
